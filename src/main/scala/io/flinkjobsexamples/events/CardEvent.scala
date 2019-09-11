@@ -1,4 +1,4 @@
-package io.populoustech.events
+package io.flinkjobsexamples.events
 
 import java.util.Calendar
 

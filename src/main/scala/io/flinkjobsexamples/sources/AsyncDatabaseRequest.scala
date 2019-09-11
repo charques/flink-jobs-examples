@@ -1,6 +1,6 @@
-package io.populoustech.sources
+package io.flinkjobsexamples.sources
 
-import io.populoustech.events.{CardAccountEnrichedElement, CardEvent}
+import io.flinkjobsexamples.events.{CardAccountEnrichedElement, CardEvent}
 import org.apache.flink.streaming.api.scala.async.{ResultFuture, RichAsyncFunction}
 
 import scala.concurrent.{ExecutionContext, Future}

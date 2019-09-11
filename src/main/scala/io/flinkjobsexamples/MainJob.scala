@@ -1,9 +1,9 @@
-package io.populoustech
+package io.flinkjobsexamples
 
 import java.util.concurrent.TimeUnit
 
-import io.populoustech.events.{CardAccountEnrichedElement, CardEvent}
-import io.populoustech.sources.{AsyncDatabaseRequest, CardEventSource}
+import io.flinkjobsexamples.events.{CardAccountEnrichedElement, CardEvent}
+import io.flinkjobsexamples.sources.{AsyncDatabaseRequest, CardEventSource}
 import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.api.java.utils.ParameterTool
 import org.apache.flink.streaming.api.scala.{AsyncDataStream, DataStream, StreamExecutionEnvironment}

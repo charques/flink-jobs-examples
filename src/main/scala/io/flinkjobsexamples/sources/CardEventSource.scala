@@ -1,6 +1,6 @@
-package io.populoustech.sources
+package io.flinkjobsexamples.sources
 
-import io.populoustech.events.CardEvent
+import io.flinkjobsexamples.events.CardEvent
 import org.apache.flink.streaming.api.functions.source.{RichParallelSourceFunction, SourceFunction}
 import org.slf4j.{Logger, LoggerFactory}
 
