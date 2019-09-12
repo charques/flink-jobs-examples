@@ -1,4 +1,4 @@
-package io.flinkjobsexamples.events
+package io.flinkjobsexamples.asyncdatastream.events
 
 import java.util.Calendar
 

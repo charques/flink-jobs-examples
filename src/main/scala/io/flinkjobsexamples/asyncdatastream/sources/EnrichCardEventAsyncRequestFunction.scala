@@ -1,11 +1,11 @@
-package io.flinkjobsexamples.sources
+package io.flinkjobsexamples.asyncdatastream.sources
 
-import io.flinkjobsexamples.events.{CardAccountEnrichedElement, CardEvent}
+import io.flinkjobsexamples.asyncdatastream.events.{CardAccountEnrichedElement, CardEvent}
 import org.apache.flink.streaming.api.scala.async.{ResultFuture, RichAsyncFunction}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AsyncDatabaseRequest extends RichAsyncFunction[CardEvent, CardAccountEnrichedElement] {
+class EnrichCardEventAsyncRequestFunction extends RichAsyncFunction[CardEvent, CardAccountEnrichedElement] {
 
   override def asyncInvoke(input: CardEvent, resultFuture: ResultFuture[CardAccountEnrichedElement]): Unit = {
     Future {
@@ -17,7 +17,7 @@ class AsyncDatabaseRequest extends RichAsyncFunction[CardEvent, CardAccountEnric
 
   override def timeout(input: CardEvent, resultFuture: ResultFuture[CardAccountEnrichedElement]): Unit = {
     val r = scala.util.Random
-    val identifier = "%010d".format(r.nextInt(10000))
+    val identifier = "%06d".format(r.nextInt(10000))
     resultFuture.complete(Seq(new CardAccountEnrichedElement(input.iban, input.amount, identifier)))
   }
 }
