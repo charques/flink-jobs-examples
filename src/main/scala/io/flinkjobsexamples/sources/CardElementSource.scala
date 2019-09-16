@@ -24,7 +24,11 @@ class CardElementSource(val numEvent: Int, val pause: Long) extends RichSourceFu
 
       sourceContext.collect(cardEvent)
 
-      counter = counter + 1
+      // use a random to generate events with the same iban - 20%
+      val randomValue = r.nextInt(5)
+      if(randomValue < 4)
+        counter = counter + 1
+
       Thread.sleep(pause)
     }
   }

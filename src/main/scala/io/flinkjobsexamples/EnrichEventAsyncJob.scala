@@ -17,11 +17,11 @@ object EnrichEventAsyncJob {
 
     val logger: Logger = LoggerFactory.getLogger(this.getClass)
     val testResult: mutable.ArrayBuffer[CardAccountElement] = mutable.ArrayBuffer[CardAccountElement]()
-    
+
     implicit val typeInfoCard: TypeInformation[CardElement] = TypeInformation.of(classOf[(CardElement)])
     implicit val typeInfoAccount: TypeInformation[CardAccountElement] = TypeInformation.of(classOf[(CardAccountElement)])
 
-    val parallelism = 2
+    val parallelism = 1
     val numEvents = 100
     val sourcePause = 50
     val ordered = false
