@@ -11,7 +11,7 @@ ThisBuild / resolvers ++= Seq(
 
 name := "flink-job-examples"
 version := "0.1-SNAPSHOT"
-organization := "io.populoustech"
+organization := "io.flinkjobexamples"
 
 ThisBuild / scalaVersion := "2.12.6"
 
@@ -20,7 +20,7 @@ lazy val root = (project in file(".")).
     libraryDependencies ++= logs ++ flinkDependencies
   )
 
-assembly / mainClass := Some("io.populoustech.MainJob")
+assembly / mainClass := Some("io.flinkjobexamples.MainJob")
 
 // make run command include the provided dependencies
 Compile / run  := Defaults.runTask(Compile / fullClasspath,
@@ -34,3 +34,4 @@ Global / cancelable := true
 
 // exclude Scala library from assembly
 assembly / assemblyOption  := (assembly / assemblyOption).value.copy(includeScala = false)
+

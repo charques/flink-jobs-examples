@@ -1,17 +1,17 @@
-package io.flinkjobsexamples.asyncdatastream.sources
+package io.flinkjobsexamples.sources
 
-import io.flinkjobsexamples.asyncdatastream.events.CardEvent
-import org.apache.flink.streaming.api.functions.source.{RichParallelSourceFunction, SourceFunction}
+import io.flinkjobsexamples.elements.CardElement
+import org.apache.flink.streaming.api.functions.source.{RichSourceFunction, SourceFunction}
 import org.slf4j.{Logger, LoggerFactory}
 
-class CardEventSource(val numEvent: Int, val pause: Long) extends RichParallelSourceFunction[CardEvent] {
+class CardElementSource(val numEvent: Int, val pause: Long) extends RichSourceFunction[CardElement] {
 
   val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private var running = true
   private var counter = 0
 
-  override def run(sourceContext: SourceFunction.SourceContext[CardEvent]): Unit = {
+  override def run(sourceContext: SourceFunction.SourceContext[CardElement]): Unit = {
     while ( {
       counter < numEvent
     }) {
@@ -19,7 +19,7 @@ class CardEventSource(val numEvent: Int, val pause: Long) extends RichParallelSo
       val r = scala.util.Random
       val amount = r.nextInt(5000)
 
-      val cardEvent = new CardEvent(iban, amount)
+      val cardEvent = new CardElement(iban, amount)
       logger.info("cardEvent: " + cardEvent.toString)
 
       sourceContext.collect(cardEvent)

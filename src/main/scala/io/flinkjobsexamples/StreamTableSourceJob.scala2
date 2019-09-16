@@ -1,0 +1,124 @@
+package io.flinkjobsexamples
+
+import io.flinkjobsexamples.elements.{AccountElement, CardAccountElement, CardElement}
+import io.flinkjobsexamples.sources.CardElementSource
+import org.apache.flink.api.common.typeinfo.TypeInformation
+import org.apache.flink.api.scala.typeutils.Types
+import org.apache.flink.configuration.Configuration
+import org.apache.flink.streaming.api.scala.{ConnectedStreams, DataStream, StreamExecutionEnvironment}
+import org.apache.flink.table.api.Table
+import org.apache.flink.table.api.scala.StreamTableEnvironment
+import org.apache.flink.table.sources.CsvTableSource
+import org.apache.flink.util.Collector
+import org.slf4j.{Logger, LoggerFactory}
+
+import scala.collection.mutable
+
+object StreamTableSourceJob {
+
+  def main(args: Array[String]): Unit = {
+
+    val logger: Logger = LoggerFactory.getLogger(this.getClass)
+    implicit val typeInfoAccount: TypeInformation[AccountElement] = TypeInformation.of(classOf[AccountElement])
+    implicit val typeInfoCard: TypeInformation[CardElement] = TypeInformation.of(classOf[CardElement])
+    implicit val typeInfoCardAccount: TypeInformation[CardAccountElement] = TypeInformation.of(classOf[CardAccountElement])
+
+    val parallelism = 1
+    val numEvents = 100
+    val sourcePause = 10
+    val ordered = false
+    val asyncTimeout = 100L
+
+    // set up execution environment
+    val env = StreamExecutionEnvironment.getExecutionEnvironment
+    val tEnv = StreamTableEnvironment.create(env)
+
+    // configure table source
+    val accountsSource: CsvTableSource = CsvTableSource.builder()
+      .path("files/accounts_data.csv")
+      .ignoreFirstLine()
+      .fieldDelimiter(",")
+      .field("iban", Types.STRING)
+      .field("identifier", Types.STRING)
+      .build()
+
+    // name your table source
+    tEnv.registerTableSource("accounts", accountsSource)
+
+    // define your table program
+    /*val accountsTable: Table = tEnv
+      .scan("accounts")
+      .select('iban, 'identifier)
+
+    val accountsStream: DataStream[AccountElement] = tEnv.toAppendStream[AccountElement](accountsTable)//.keyBy("iban")
+    val cardsEventStream: DataStream[CardElement] = env.addSource(new CardElementSource(numEvents, sourcePause))//.keyBy("iban")
+
+    val connectedStream: ConnectedStreams[CardElement, AccountElement] = cardsEventStream.connect(accountsStream)
+    val cc: DataStream[CardAccountElement] = connectedStream.flatMap(new EnrichFunction())
+
+    cc.addSink((cardAccountElement: CardAccountElement) => {
+      logger.info("cardAccountEnrichedElement: " + cardAccountElement.toString)
+    })*/
+
+    // https://github.com/apache/flink/blob/master/flink-examples/flink-examples-streaming/src/main/java/org/apache/flink/streaming/examples/ml/IncrementalLearningSkeleton.java
+    // https://training.ververica.com/lessons/connected-streams.html
+
+    env.execute()
+  }
+
+  import org.apache.flink.streaming.api.functions.co.RichCoFlatMapFunction
+
+  class EnrichFunction extends RichCoFlatMapFunction[CardElement, AccountElement, CardAccountElement] {
+
+    val logger: Logger = LoggerFactory.getLogger(this.getClass)
+    //private var cardElement: ValueState[Int] = _
+    val state: mutable.HashMap[String, CardElement] = mutable.HashMap()
+
+    override def open(config: Configuration): Unit = {
+      //cardElement = getRuntimeContext.getState(new ValueStateDescriptor("amount", classOf[Int]));
+    }
+
+    override def flatMap1(value: CardElement, out: Collector[CardAccountElement]): Unit = {
+      /*if (cardElement.value() != 0) {
+        val amount = cardElement.value()
+        out.collect(new CardAccountElement(value.iban, amount, value.identifier))
+      }*/
+      out
+      state.update(value.iban, value)
+    }
+
+    override def flatMap2(value: AccountElement, out: Collector[CardAccountElement]): Unit = {
+      //cardElement.update(value.amount)
+      if(state.get(value.iban).isDefined) {
+        out.collect(new CardAccountElement(value.iban, state(value.iban).amount, value.identifier))
+      }
+    }
+
+
+
+    /*private var enrich: ValueState[CardAccountElement] = _
+
+    override def open(config: Configuration): Unit = {
+      enrich = getRuntimeContext.getState(new ValueStateDescriptor("enrich", classOf[CardAccountElement], new CardAccountElement()));
+    }
+
+    override def flatMap1(value: CardElement, out: Collector[CardAccountElement]): Unit = {
+      val e1 = enrich.value()
+      e1.iban = value.iban
+      e1.amount = value.amount
+      enrich.update(e1)
+      //enrich.update(enrich2)
+    }
+
+    override def flatMap2(value: AccountElement, out: Collector[CardAccountElement]): Unit = {
+      //val value = enrich.value()
+      //value.iban(value.iban)
+      val e2 = enrich.value()
+      e2.identifier = value.identifier
+      enrich.update(e2)
+     // enrich.update(value)
+    }*/
+
+  }
+
+}
