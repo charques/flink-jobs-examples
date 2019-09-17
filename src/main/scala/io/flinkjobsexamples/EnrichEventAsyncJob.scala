@@ -2,10 +2,13 @@ package io.flinkjobsexamples
 
 import java.util.concurrent.TimeUnit
 
+import com.codahale.metrics.{ConsoleReporter, SharedMetricRegistries}
 import io.flinkjobsexamples.functions.EnrichCardElementAsyncRequestFunction
 import io.flinkjobsexamples.elements.{CardAccountElement, CardElement}
 import io.flinkjobsexamples.sources.CardElementSource
 import org.apache.flink.api.common.typeinfo.TypeInformation
+import org.apache.flink.configuration.Configuration
+import org.apache.flink.streaming.api.environment.LocalStreamEnvironment
 import org.apache.flink.streaming.api.scala.{AsyncDataStream, DataStream, StreamExecutionEnvironment}
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -21,13 +24,18 @@ object EnrichEventAsyncJob {
     implicit val typeInfoCard: TypeInformation[CardElement] = TypeInformation.of(classOf[(CardElement)])
     implicit val typeInfoAccount: TypeInformation[CardAccountElement] = TypeInformation.of(classOf[(CardAccountElement)])
 
+    val config = new Configuration()
+    config.setString("metrics.reporters", "consoleReporter")
+    config.setString("metrics.reporter.consoleReporter.class", "io.flinkjobsexamples.metrics.ConsoleReporter")
+    config.setString("metrics.reporter.consoleReporter.interval", "2 SECONDS")
+
     val parallelism = 1
     val numEvents = 100
     val sourcePause = 50
     val ordered = false
     val asyncTimeout = 100L
 
-    val env = StreamExecutionEnvironment.getExecutionEnvironment
+    val env =  new StreamExecutionEnvironment(new LocalStreamEnvironment(config))
     env.setParallelism(parallelism)
 
     val inputEventStream: DataStream[CardElement] = env.addSource(new CardElementSource(numEvents, sourcePause))

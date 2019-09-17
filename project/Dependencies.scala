@@ -12,9 +12,7 @@ object Dependencies {
   val flinkDependencies: Seq[ModuleID] = Seq(
     "org.apache.flink" %% "flink-scala" % flinkVersion % "provided",
     "org.apache.flink" %% "flink-streaming-scala" % flinkVersion,
-    "org.apache.flink" %% "flink-table-uber" % flinkVersion
-    /*"org.apache.flink" % "flink-table-common" % flinkVersion % "provided",
-    "org.apache.flink" %% "flink-table-planner" % flinkVersion % "provided",
-    "org.apache.flink" % "flink-table" % flinkVersion % "provided" pomOnly()*/)
+    "org.apache.flink" %% "flink-table-uber" % flinkVersion,
+    "org.apache.flink" % "flink-metrics-dropwizard" % flinkVersion)
 
 }
